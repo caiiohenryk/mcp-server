@@ -1,0 +1,7 @@
+# Ajuste os times/usuários abaixo para os handles reais do GitHub.
+*                       @caiiohenryk
+/standards/             @caiiohenryk
+/src/server/standards/schema.ts  @caiiohenryk
+/src/server/auth/       @caiiohenryk
+/src/server/tokens/     @caiiohenryk
+/docs/adr/              @caiiohenryk
