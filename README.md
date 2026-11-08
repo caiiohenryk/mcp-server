@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MCP Standards Server
 
-## Getting Started
+Servidor MCP + painel para padronizar como LLMs (Claude, GPT, Grok, Gemini…) escrevem código nos projetos do time.
+Pessoas autorizadas entram via OAuth, geram um token pessoal e conectam sua ferramenta de IA ao endpoint
+`/api/mcp`, que serve standards opinativos de arquitetura e boas práticas por tecnologia.
 
-First, run the development server:
+> Agentes de IA: leiam [`AGENTS.md`](./AGENTS.md) antes de qualquer alteração.
+
+## Rodando localmente
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env            # preencha AUTH_SECRET, TOKEN_PEPPER, ADMIN_EMAILS e ao menos 1 provider OAuth
+docker compose up -d postgres
+pnpm install
+pnpm db:migrate
+pnpm dev                        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Callback OAuth a cadastrar no provider: `http://localhost:3000/api/auth/callback/<google|microsoft-entra-id|github>`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Como funciona
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Parte             | Onde                                  |
+| ----------------- | ------------------------------------- |
+| Login + allowlist | `src/server/auth/`                    |
+| Tokens `pv1_…`    | `src/server/tokens/`                  |
+| Servidor MCP      | `src/server/mcp/`, `src/app/api/mcp/` |
+| Conteúdo          | `standards/<tecnologia>/*.md`         |
+| Painel            | `src/app/(dashboard)/`                |
+| Decisões          | `docs/adr/`                           |
 
-## Learn More
+## Contribuindo com standards
 
-To learn more about Next.js, take a look at the following resources:
+Veja [`standards/_meta/AUTHORING.md`](./standards/_meta/AUTHORING.md). Valide com `pnpm standards:lint`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Qualidade
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`pnpm check` roda lint, typecheck, testes e validação de conteúdo — o mesmo que o CI.
