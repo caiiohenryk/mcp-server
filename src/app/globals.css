@@ -1,26 +1,323 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens: see docs/design.md ("especificação marcada").
+ * Raw palette lives in CSS variables so light/dark switch without class juggling.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  color-scheme: light;
+  --paper: #f2f3f5;
+  --sheet: #ffffff;
+  --ink: #1c1f26;
+  --pencil: #585e6c;
+  --line: #d6d9e0;
+  --line-strong: #b4b9c4;
+  --pen: #2445c4;
+  --pen-hover: #1a3399;
+  --pen-ink: #ffffff;
+  --red: #b3261e;
+  --red-soft: #fbe9e7;
+  --green: #1d6b3a;
+  --green-soft: #e3f2e8;
+  --code-bg: #f7f8fa;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Highlighter marks (RFC 2119 levels). Text on marks is always --mark-ink. */
+  --mark-ink: #1c1f26;
+  --mark-must: #ffd84d;
+  --mark-must-not: #ffb3ad;
+  --mark-should: #bcd0ff;
+  --mark-should-not: #d9c8ff;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #16181d;
+    --sheet: #1e2128;
+    --ink: #e6e8ed;
+    --pencil: #a0a6b4;
+    --line: #2f333d;
+    --line-strong: #474c58;
+    --pen: #93a8ff;
+    --pen-hover: #b5c3ff;
+    --pen-ink: #10131a;
+    --red: #ff8e86;
+    --red-soft: #3a1f1e;
+    --green: #7fd69c;
+    --green-soft: #1b3024;
+    --code-bg: #191b21;
   }
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #16181d;
+  --sheet: #1e2128;
+  --ink: #e6e8ed;
+  --pencil: #a0a6b4;
+  --line: #2f333d;
+  --line-strong: #474c58;
+  --pen: #93a8ff;
+  --pen-hover: #b5c3ff;
+  --pen-ink: #10131a;
+  --red: #ff8e86;
+  --red-soft: #3a1f1e;
+  --green: #7fd69c;
+  --green-soft: #1b3024;
+  --code-bg: #191b21;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-ink: var(--ink);
+  --color-pencil: var(--pencil);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-pen: var(--pen);
+  --color-pen-hover: var(--pen-hover);
+  --color-pen-ink: var(--pen-ink);
+  --color-red: var(--red);
+  --color-red-soft: var(--red-soft);
+  --color-green: var(--green);
+  --color-green-soft: var(--green-soft);
+  --color-code: var(--code-bg);
+  --color-mark-ink: var(--mark-ink);
+  --color-mark-must: var(--mark-must);
+  --color-mark-must-not: var(--mark-must-not);
+  --color-mark-should: var(--mark-should);
+  --color-mark-should-not: var(--mark-should-not);
+
+  --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Type scale ~1.25 */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5625rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
+  --text-4xl: 3.052rem;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01";
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--mark-must);
+  color: var(--mark-ink);
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--pen);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/*
+ * The highlighter mark: the one bold gesture of the design.
+ * A marker stroke that leaves a sliver of paper at the top and is slightly irregular.
+ */
+.mark {
+  --mark-color: var(--mark-must);
+  color: var(--mark-ink);
+  background-image: linear-gradient(
+    176deg,
+    transparent 0 8%,
+    var(--mark-color) 8% 92%,
+    transparent 92% 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border-radius: 0.25em 0.6em 0.3em 0.5em;
+  padding: 0.05em 0.35em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.mark-must {
+  --mark-color: var(--mark-must);
+}
+.mark-must-not {
+  --mark-color: var(--mark-must-not);
+}
+.mark-should {
+  --mark-color: var(--mark-should);
+}
+.mark-should-not {
+  --mark-color: var(--mark-should-not);
+}
+.mark-may {
+  background-image: none;
+  color: inherit;
+  outline: 1.5px dotted var(--pencil);
+  outline-offset: -1.5px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Standard document prose                                             */
+/* ------------------------------------------------------------------ */
+.standard-prose {
+  max-width: 72ch;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+.standard-prose > * + *,
+.standard-prose .rule > * + * {
+  margin-top: 1rem;
+}
+.standard-prose h2 {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+.standard-prose h3 {
+  margin-top: 2rem;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.standard-prose h4 {
+  margin-top: 1.5rem;
+  font-weight: 700;
+}
+.standard-prose p,
+.standard-prose li {
+  text-wrap: pretty;
+}
+.standard-prose ul,
+.standard-prose ol {
+  padding-left: 1.4rem;
+}
+.standard-prose ul {
+  list-style: disc;
+}
+.standard-prose ol {
+  list-style: decimal;
+}
+.standard-prose li + li {
+  margin-top: 0.35rem;
+}
+.standard-prose a {
+  color: var(--pen);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.standard-prose strong {
+  font-weight: 700;
+}
+.standard-prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0.05em 0.3em;
+}
+.standard-prose pre {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+.standard-prose blockquote {
+  border-left: 3px solid var(--line-strong);
+  padding-left: 1rem;
+  color: var(--pencil);
+}
+.standard-prose .table-scroll {
+  overflow-x: auto;
+}
+.standard-prose table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9375rem;
+}
+.standard-prose th,
+.standard-prose td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  text-align: left;
+  vertical-align: top;
+}
+.standard-prose th {
+  font-weight: 700;
+  border-bottom-color: var(--line-strong);
+}
+
+/* A rule: heading + body, tied together by a vertical line in the level's color. */
+.standard-prose .rule {
+  margin-top: 2rem;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  scroll-margin-top: 5rem;
+}
+.standard-prose .rule-heading {
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  scroll-margin-top: 5rem;
+}
+.standard-prose .rule-id {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--pencil);
+  text-decoration: none;
+  width: fit-content;
+}
+.standard-prose .rule-id:hover {
+  color: var(--pen);
+  text-decoration: underline;
+}
+.standard-prose .rule-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+/* One orchestrated moment: the marker sweeps once over the specimen rule on /login. */
+@media (prefers-reduced-motion: no-preference) {
+  .mark-sweep {
+    animation: mark-sweep 700ms cubic-bezier(0.6, 0, 0.2, 1) 350ms both;
+  }
+}
+
+@keyframes mark-sweep {
+  from {
+    background-size: 0% 100%;
+  }
+  to {
+    background-size: 100% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
