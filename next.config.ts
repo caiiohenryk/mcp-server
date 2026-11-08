@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Keep AGENTS.md as the single hand-written source of agent rules (no auto-appended block).
+  agentRules: false,
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
